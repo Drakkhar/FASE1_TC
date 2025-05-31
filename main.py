@@ -21,7 +21,12 @@ def home():
     return {"mensagem": "API do Projeto Tech Challenger - Vitibrasil"}
 
 # Rota GET para consulta dos dados de Produção
-@app.get("/producao/{ano}")
+@app.get(
+        "/producao/{ano}",
+        summary="Consultar produção por ano",
+        description="Retorna os dados de produção de vinhos, sucos e derivados para o ano informado.",
+        response_description="Dados extraídos com sucesso"
+         )
 def get_producao(ano: int):
     try:
         dados = producao_rt(ano)
@@ -32,7 +37,12 @@ def get_producao(ano: int):
         raise HTTPException(status_code=500, Erro=f"Erro interno: {str(e)}")
 
 # Rota GET para consulta dos dados de Processamento    
-@app.get("/processamento/{ano}/{opcao}")
+@app.get(
+        "/processamento/{ano}/{opcao}",
+            summary="Consultar processamento por ano e item",
+            description="Retorna os dados de processamento de uvas para o ano e opção informada.",
+            response_description="Dados extraídos com sucesso"
+        )
 def get_processamento(ano: int, opcao: int):
     try:
         dados = processamento_rt(ano, opcao)
@@ -44,7 +54,11 @@ def get_processamento(ano: int, opcao: int):
 
 
 # Rota GET para consulta dos dados de Comercialização    
-@app.get("/comercializacao/{ano}")
+@app.get(
+        "/comercializacao/{ano}",
+        summary="Consultar comercialização por ano",
+        description="Retorna os dados de comercialização de vinho e derivados para o ano informado.",
+        response_description="Dados extraídos com sucesso")
 def get_comercializacao(ano: int):
     try:
         dados = comercializacao_rt(ano)
@@ -55,7 +69,11 @@ def get_comercializacao(ano: int):
         raise HTTPException(status_code=500, Erro=f"Erro interno: {str(e)}")
     
 # Rota GET para consulta dos dados de Importação    
-@app.get("/importacao/{ano}/{opcao}")
+@app.get(
+        "/importacao/{ano}/{opcao}",
+        summary="Consultar importação por ano e item",
+        description="Retorna os dados de importação de derivados de uva para o ano e opção informada.",
+        response_description="Dados extraídos com sucesso")
 def get_importacao(ano: int, opcao: int):
     try:
         dados = importacao_rt(ano, opcao)
@@ -66,7 +84,11 @@ def get_importacao(ano: int, opcao: int):
         raise HTTPException(status_code=500, Erro=f"Erro interno: {str(e)}")       
 
 # Rota GET para consulta dos dados de Processamento    
-@app.get("/exportacao/{ano}/{opcao}")
+@app.get(
+        "/exportacao/{ano}/{opcao}",
+        summary="Consultar exportação por ano e item",
+        description="Retorna os dados de exportação de derivados de uva para o ano e opção informada.",
+        response_description="Dados extraídos com sucesso")
 def get_exportacao(ano: int, opcao: int):
     try:
         dados = exportacao_rt(ano, opcao)

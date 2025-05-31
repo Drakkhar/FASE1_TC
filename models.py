@@ -18,10 +18,9 @@ class Producao(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
-    estado = Column(String, nullable=False)
-    variedade = Column(String, nullable=False)
-    quantidade = Column(Float, nullable=False)
-    unidade = Column(String, nullable=True)
+    produto_macro = Column(String, nullable=False)
+    produto_micro = Column(String, nullable=False)
+    quantidade = Column(Integer, nullable=False)
 
 # Exemplo de tabela para Processamento
 class Processamento(Base):
@@ -30,8 +29,9 @@ class Processamento(Base):
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
     tipo = Column(String, nullable=False)
-    quantidade = Column(Float, nullable=False)
-    unidade = Column(String, nullable=True)
+    produto_macro = Column(String, nullable=False)
+    produto_micro = Column(String, nullable=False)    
+    quantidade = Column(Integer, nullable=False)
 
 # Comercialização
 class Comercializacao(Base):
@@ -39,10 +39,10 @@ class Comercializacao(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
-    produto = Column(String, nullable=False)
-    local = Column(String, nullable=False)
-    valor = Column(Float, nullable=False)
-    unidade = Column(String, nullable=True)
+    produto_macro = Column(String, nullable=False)
+    produto_micro = Column(String, nullable=False)
+    quantidade = Column(Integer, nullable=False)
+
 
 # Importação
 class Importacao(Base):
@@ -50,10 +50,10 @@ class Importacao(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
+    tipo = Column(String, nullable=False)
     pais = Column(String, nullable=False)
-    produto = Column(String, nullable=False)
-    quantidade = Column(Float, nullable=False)
-    unidade = Column(String, nullable=True)
+    quantidade = Column(Integer, nullable=False)
+    valor = Column(Integer, nullable=False)
 
 # Exportação
 class Exportacao(Base):
@@ -61,7 +61,7 @@ class Exportacao(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
+    tipo = Column(String, nullable=False)
     pais = Column(String, nullable=False)
-    produto = Column(String, nullable=False)
-    quantidade = Column(Float, nullable=False)
-    unidade = Column(String, nullable=True)
+    quantidade = Column(Integer, nullable=False)
+    valor = Column(Integer, nullable=False)

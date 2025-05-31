@@ -1,138 +1,177 @@
 import requests
 from bs4 import BeautifulSoup
+import json
 from models import (
     SessionLocal, Producao, Processamento,
     Comercializacao, Importacao, Exportacao
 )
+import re
 
 
 def get_soup(url):
     response = requests.get(url)
     response.encoding = 'utf-8'
+    response.raise_for_status()
     return BeautifulSoup(response.text, 'html.parser')
 
 
-def salvar_producao():
-    url = "http://vitibrasil.cnpuv.embrapa.br/index.php?opcao=opt_02"
+def producao_rt(ano: int):
+    url = f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_02"
     soup = get_soup(url)
-    table = soup.find_all("table")[1]
-    linhas = table.find_all("tr")[2:]
+    table = soup.find('table', {'class': 'tb_base tb_dados'})
 
-    db = SessionLocal()
-    for linha in linhas:
-        colunas = linha.find_all("td")
-        if len(colunas) == 5:
-            ano = int(colunas[0].text.strip())
-            produto_macro = colunas[1].text.strip()
-            produto_micro = colunas[2].text.strip()
-            quantidade = int(float(colunas[3].text.strip().replace(".", "").replace(",", ".")))
-            db.add(Producao(
-                ano=ano,
-                produto_macro=produto_macro,
-                produto_micro=produto_micro,
-                quantidade=quantidade
-            ))
-    db.commit()
-    db.close()
+    if not table:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+
+    rows = table.find_all('tr')
+
+    if len(rows) <= 1:
+        raise ValueError("Nenhum dado disponível para o ano informado.")
+    
+    if ano < 1970 or ano > 2025:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+
+    headers = [cell.get_text(strip=True) for cell in rows[0].find_all(['th', 'td'])]
+    data = []
+
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) == len(headers):
+            row_data = {headers[i]: cells[i].get_text(strip=True) for i in range(len(headers))}
+            data.append(row_data)
+
+    if not data:
+        raise ValueError("Ano encontrado, mas sem dados na tabela.")
+
+    return data
 
 
-def salvar_processamento():
-    url = "http://vitibrasil.cnpuv.embrapa.br/index.php?opcao=opt_03"
+def processamento_rt(ano: int, opcao: int):
+    url = f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_03&subopcao=subopt_0{opcao}"
     soup = get_soup(url)
-    table = soup.find_all("table")[1]
-    linhas = table.find_all("tr")[2:]
+    table = soup.find('table', {'class': 'tb_base tb_dados'})
 
-    db = SessionLocal()
-    for linha in linhas:
-        colunas = linha.find_all("td")
-        if len(colunas) == 5:
-            ano = int(colunas[0].text.strip())
-            tipo = colunas[1].text.strip()
-            produto_macro = colunas[2].text.strip()
-            produto_micro = colunas[3].text.strip()
-            quantidade = int(float(colunas[4].text.strip().replace(".", "").replace(",", ".")))
-            db.add(Processamento(
-                ano=ano,
-                tipo=tipo,
-                produto_macro=produto_macro,
-                produto_micro=produto_micro,
-                quantidade=quantidade
-            ))
-    db.commit()
-    db.close()
+    if not table:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+
+    rows = table.find_all('tr')
+
+    if len(rows) <= 1:
+        raise ValueError("Nenhum dado disponível para o ano informado.")
+    
+    if ano < 1970 or ano > 2025:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+    
+    if opcao < 1 or opcao > 4:
+        raise ValueError("Insira uma opção válida (entre 1 e 4).")
+
+    headers = [cell.get_text(strip=True) for cell in rows[0].find_all(['th', 'td'])]
+    data = []
+
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) == len(headers):
+            row_data = {headers[i]: cells[i].get_text(strip=True) for i in range(len(headers))}
+            data.append(row_data)
+
+    if not data:
+        raise ValueError("Ano encontrado, mas sem dados na tabela.")
+
+    return data
 
 
-def salvar_comercializacao():
-    url = "http://vitibrasil.cnpuv.embrapa.br/index.php?opcao=opt_04"
+def comercializacao_rt(ano: int):
+    url = f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_04"
     soup = get_soup(url)
-    table = soup.find_all("table")[1]
-    linhas = table.find_all("tr")[2:]
+    table = soup.find('table', {'class': 'tb_base tb_dados'})
 
-    db = SessionLocal()
-    for linha in linhas:
-        colunas = linha.find_all("td")
-        if len(colunas) == 4:
-            ano = int(colunas[0].text.strip())
-            produto_macro = colunas[1].text.strip()
-            produto_micro = colunas[2].text.strip()
-            quantidade = int(float(colunas[3].text.strip().replace(".", "").replace(",", ".")))
-            db.add(Comercializacao(
-                ano=ano,
-                produto_macro=produto_macro,
-                produto_micro=produto_micro,
-                quantidade=quantidade
-            ))
-    db.commit()
-    db.close()
+    if not table:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
 
+    rows = table.find_all('tr')
 
-def salvar_exportacao():
-    url = "http://vitibrasil.cnpuv.embrapa.br/index.php?opcao=opt_06"
+    if len(rows) <= 1:
+        raise ValueError("Nenhum dado disponível para o ano informado.")
+    
+    if ano < 1970 or ano > 2025:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+    
+    headers = [cell.get_text(strip=True) for cell in rows[0].find_all(['th', 'td'])]
+    data = []
+
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) == len(headers):
+            row_data = {headers[i]: cells[i].get_text(strip=True) for i in range(len(headers))}
+            data.append(row_data)
+
+    if not data:
+        raise ValueError("Ano encontrado, mas sem dados na tabela.")
+
+    return data
+
+def importacao_rt(ano: int, opcao: int):
+    url = f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_05&subopcao=subopt_0{opcao}"
     soup = get_soup(url)
-    table = soup.find_all("table")[1]
-    linhas = table.find_all("tr")[2:]
+    table = soup.find('table', {'class': 'tb_base tb_dados'})
 
-    db = SessionLocal()
-    for linha in linhas:
-        colunas = linha.find_all("td")
-        if len(colunas) == 5:
-            ano = int(colunas[0].text.strip())
-            tipo = colunas[1].text.strip()
-            pais = colunas[2].text.strip()
-            quantidade = int(float(colunas[3].text.strip().replace(".", "").replace(",", ".")))
-            valor = int(float(colunas[4].text.strip().replace(".", "").replace(",", ".")))
-            db.add(Exportacao(
-                ano=ano,
-                tipo=tipo,
-                pais=pais,
-                quantidade=quantidade,
-                valor=valor
-            ))
-    db.commit()
-    db.close()
+    if not table:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
 
+    rows = table.find_all('tr')
 
-def salvar_importacao():
-    url = "http://vitibrasil.cnpuv.embrapa.br/index.php?opcao=opt_05"
+    if len(rows) <= 1:
+        raise ValueError("Nenhum dado disponível para o ano informado.")
+    
+    if ano < 1970 or ano > 2025:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+    
+    if opcao < 1 or opcao > 5:
+        raise ValueError("Insira uma opção válida (entre 1 e 5).")
+
+    headers = [cell.get_text(strip=True) for cell in rows[0].find_all(['th', 'td'])]
+    data = []
+
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) == len(headers):
+            row_data = {headers[i]: cells[i].get_text(strip=True) for i in range(len(headers))}
+            data.append(row_data)
+
+    if not data:
+        raise ValueError("Ano encontrado, mas sem dados na tabela.")
+
+    return data
+
+def exportacao_rt(ano: int, opcao: int):
+    url = f"http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_06&subopcao=subopt_0{opcao}"
     soup = get_soup(url)
-    table = soup.find_all("table")[1]
-    linhas = table.find_all("tr")[2:]
+    table = soup.find('table', {'class': 'tb_base tb_dados'})
 
-    db = SessionLocal()
-    for linha in linhas:
-        colunas = linha.find_all("td")
-        if len(colunas) == 5:
-            ano = int(colunas[0].text.strip())
-            tipo = colunas[1].text.strip()
-            pais = colunas[2].text.strip()
-            quantidade = int(float(colunas[3].text.strip().replace(".", "").replace(",", ".")))
-            valor = int(float(colunas[4].text.strip().replace(".", "").replace(",", ".")))
-            db.add(Importacao(
-                ano=ano,
-                tipo=tipo,
-                pais=pais,
-                quantidade=quantidade,
-                valor=valor
-            ))
-    db.commit()
-    db.close()
+    if not table:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+
+    rows = table.find_all('tr')
+
+    if len(rows) <= 1:
+        raise ValueError("Nenhum dado disponível para o ano informado.")
+    
+    if ano < 1970 or ano > 2025:
+        raise ValueError("Tabela de dados não encontrada para o ano informado.")
+    
+    if opcao < 1 or opcao > 4:
+        raise ValueError("Insira uma opção válida (entre 1 e 4).")
+
+    headers = [cell.get_text(strip=True) for cell in rows[0].find_all(['th', 'td'])]
+    data = []
+
+    for row in rows[1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) == len(headers):
+            row_data = {headers[i]: cells[i].get_text(strip=True) for i in range(len(headers))}
+            data.append(row_data)
+
+    if not data:
+        raise ValueError("Ano encontrado, mas sem dados na tabela.")
+
+    return data

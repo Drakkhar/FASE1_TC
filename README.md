@@ -2,7 +2,7 @@
 
 Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a raspagem de dados do site [Vitibrasil Embrapa](http://vitibrasil.cnpuv.embrapa.br/index.php?subopcao=subopt_01&opcao=opt_06). O objetivo é fornecer acesso em tempo real aos dados de produção, processamento, comercialização, importação e exportação de vinhos e derivados no Brasil, com uma estrutura de fallback para base local (`vitibrasil.db`).
 
-## Tecnologias Utilizadas
+## ![image](https://github.com/user-attachments/assets/08dc21e4-2d2d-46aa-b683-42b3f252bfa7) Tecnologias Utilizadas
 
 - Python
 - FastAPI
@@ -13,7 +13,7 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 - Pandas
 - Uvicorn
 
-## Estrutura do Projeto
+## 📁 Estrutura do Projeto
 
 ```
 .API/
@@ -30,7 +30,8 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 ├── requirements.txt       # Dependências do projeto
 └── .gitignore             # Exclusões de versionamento
 ```
-## Lógica de Funcionamento
+
+## 🚀 Lógica de Funcionamento
 
 - **Raspagem em tempo real**: tentativas de obter dados diretamente do site.
 - **Fallback**: se o site estiver fora ou demorar, os dados são retornados do `vitibrasil.db`.
@@ -46,37 +47,38 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 
 ### Passos
 
-1. Clone o repositório:
+ ## 1. Clone o repositório:
    
    ```bash
    git clone https://github.com/Drakkhar/FASE1_TC.git
    cd FASE1_TC
+   ```
 
-2. Crie e ative um ambiente virtual:
+ ## 2. Crie e ative um ambiente virtual:
 
-```bash
-python -m venv venv
-source venv/bin/activate  # No Windows: venv\Scripts\activate
-```
+  ```bash
+  python -m venv venv
+  source venv/bin/activate  # No Windows: venv\Scripts\activate
+  ```
 
-3. Instale as dependências:
+ ## 3. Instale as dependências:
    
-```bash
-pip install -r requirements.txt
-```
+  ```bash
+  pip install -r requirements.txt
+  ```
 
-4.Raspagem e atualização dos dados:
+ ## 4. Raspagem e atualização dos dados:
 
-```bash
-python scraper.py
-python atualizar_banco.py
-```
+  ```bash
+  python scraper.py
+  python atualizar_banco.py
+  ```
 
-5. Inicie a API:
-6. 
-```bash
-uvicorn main:app --reload
-```
+ ## 5. Inicie a API:
+   
+  ```bash
+  uvicorn main:app --reload
+  ```
 
 Acesse a documentação interativa da API:
 
@@ -85,7 +87,7 @@ http://127.0.0.1:8000/docs
 🚀 Implantação
 O projeto está configurado para ser implantado na plataforma Vercel, utilizando o arquivo vercel.json. Basta conectar o repositório à sua conta Vercel e realizar a primeira implantação.
 
-## Colaboradores
+🤝 Colaboradores
 
 - Pedro Paolielo
 - Erick Navevaiko

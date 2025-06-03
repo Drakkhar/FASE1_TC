@@ -47,34 +47,34 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 
 ### Passos
 
- ## 1. Clone o repositório:
+ ### 1. Clone o repositório:
    
    ```bash
    git clone https://github.com/Drakkhar/FASE1_TC.git
    cd FASE1_TC
    ```
 
- ## 2. Crie e ative um ambiente virtual:
+ ### 2. Crie e ative um ambiente virtual:
 
   ```bash
   python -m venv venv
   source venv/bin/activate  # No Windows: venv\Scripts\activate
   ```
 
- ## 3. Instale as dependências:
+ ### 3. Instale as dependências:
    
   ```bash
   pip install -r requirements.txt
   ```
 
- ## 4. Raspagem e atualização dos dados:
+ ### 4. Raspagem e atualização dos dados:
 
   ```bash
   python scraper.py
   python atualizar_banco.py
   ```
 
- ## 5. Inicie a API:
+ ### 5. Inicie a API:
    
   ```bash
   uvicorn main:app --reload

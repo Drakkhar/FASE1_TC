@@ -88,7 +88,7 @@ http://127.0.0.1:8000/docs
 
 O projeto está configurado para ser implantado na plataforma Vercel, utilizando o arquivo vercel.json. Basta conectar o repositório à sua conta Vercel e realizar a primeira implantação.
 
-🤝 Colaboradores
+## 🤝 Colaboradores
 
 - Pedro Paolielo
 - Erick Navevaiko

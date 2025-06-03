@@ -17,7 +17,7 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 
 ```
 .API/
-  ├── index.py                # Inicialização da API e rotas
+  ├── index.py             # Inicialização da API e rotas
 ├── models.py              # Modelos do banco de dados
 ├── scraper.py             # Funções de raspagem em tempo real
 ├── atualizar_banco.py     # Script para atualizar o banco local

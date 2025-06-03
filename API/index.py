@@ -1,68 +1,139 @@
-from fastapi import FastAPI, HTTPException
-from models import Base, engine
-from scraper import (
-    producao_rt,
-    comercializacao_rt,
-    processamento_rt,
-    importacao_rt,
-    exportacao_rt
-)
+from flask import Flask, jsonify, request
+from flask_httpauth import HTTPBasicAuth
+from flasgger import Swagger ##/apidocs
+import requests
+from bs4 import BeautifulSoup
 
-# Criação do banco e tabelas (executado apenas se o banco estiver vazio)
-Base.metadata.create_all(bind=engine)
+app = Flask(__name__) 
 
-app = FastAPI(title="Vitibrasil Scraper API")
+app.config['SWAGGER'] = {
+    'title': 'My Flask API',
+    'universion': 3
+}
 
-@app.get("/")
+Swagger = Swagger(app)
+
+auth = HTTPBasicAuth()
+
+users = {
+    "user1": "password1",
+    "user2": "password2"
+}
+
+@app.route('/hello', methods=['GET'])
+@auth.login_required
+def hello():
+    return jsonify({"message":"Hello, world!"})
+
+
+
+@auth.verify_password
+def verify_password(username, password):
+        if username in users and users[username] == password:
+            return username
+
+@app.route('/')
 def home():
-    return {"mensagem": "API do Projeto Tech Challenger - Vitibrasil"}
+    return "Hello, Flask"
 
-@app.get("/producao/{ano}")
-def get_producao(ano: int):
-    try:
-        dados = producao_rt(ano)
-        return {"status": "ok", "ano": ano, "dados": dados}
-    except ValueError as ve:
-        raise HTTPException(status_code=404, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
-@app.get("/processamento/{ano}/{opcao}")
-def get_processamento(ano: int, opcao: int):
-    try:
-        dados = processamento_rt(ano, opcao)
-        return {"status": "ok", "ano": ano, "tipo": opcao, "dados": dados}
-    except ValueError as ve:
-        raise HTTPException(status_code=404, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+items = []
 
-@app.get("/comercializacao/{ano}")
-def get_comercializacao(ano: int):
-    try:
-        dados = comercializacao_rt(ano)
-        return {"status": "ok", "ano": ano, "dados": dados}
-    except ValueError as ve:
-        raise HTTPException(status_code=404, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+@app.route('/items', methods=['GET'])
+def get_items():
+    return jsonify(items)
 
-@app.get("/importacao/{ano}/{opcao}")
-def get_importacao(ano: int, opcao: int):
-    try:
-        dados = importacao_rt(ano, opcao)
-        return {"status": "ok", "ano": ano, "tipo": opcao, "dados": dados}
-    except ValueError as ve:
-        raise HTTPException(status_code=404, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+@app.route('/items', methods=['POST'])
+def create_item():
+    data = request.get_json()
+    items.append(data)
+    return jsonify(data), 201
 
-@app.get("/exportacao/{ano}/{opcao}")
-def get_exportacao(ano: int, opcao: int):
+@app.route('/items/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+    data = request.get_json()
+    if 0 <= item_id < len(items):
+        items[item_id].update(data)
+        return jsonify(items[item_id])
+    return jsonify({"erro": "Item not found"}), 404
+
+@app.route('/items/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+    if 0 <= item_id < len(items):
+        removed = items.pop(item_id)
+        return jsonify(removed)
+    return jsonify({"erro": "Item not found"}), 404
+
+def get_title(url):
     try:
-        dados = exportacao_rt(ano, opcao)
-        return {"status": "ok", "ano": ano, "tipo": opcao, "dados": dados}
-    except ValueError as ve:
-        raise HTTPException(status_code=404, detail=str(ve))
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        title = soup.title.string.strip()
+        return jsonify({"title": title})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+        return jsonify({"error": str(e)}),500
+
+@app.route('/scrape/title', methods=['GET'])
+@auth.login_required
+def scrape_title():
+    """
+    Extract the title of a web page provide by the URL.
+    ---
+    security:
+        -   BasicAtuth: []
+    parameters:
+        -   name: url
+            in: query
+            type: string
+            required: true
+            description: URL of the web page
+    responses:
+        200:
+            description: Web page title
+    """
+    url = request.args.get('url')
+    if not url:
+        return jsonify({"error": "URL is required"}), 400
+    return get_title(url)
+
+def get_content(url):
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        headers =[]
+        for header_tag in ['h1', 'h2', 'h3']:
+            for header in soup.find_all(header_tag):
+                headers.append(header.get_text(strip=True))
+        
+        paragraphs = [p.get_text(strip=True) for p in soup.find_all('p')]
+        return jsonify({"headers": headers, "paragraphs": paragraphs})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/scrape/content', methods=['GET'])
+@auth.login_required
+def scrape_content():
+    """
+    Extract the title of a web page provide by the URL.
+    ---
+    security:
+        -   BasicAtuth: []
+    parameters:
+        -   name: url
+            in: query
+            type: string
+            required: true
+            description: URL of the web page
+    responses:
+        200:
+            description: Web page title
+    """
+    url = request.args.get('url')
+    if not url:
+        return jsonify({"error": "URL is required"}), 400
+    return get_content(url)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

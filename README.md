@@ -36,6 +36,50 @@ Este projeto consiste em uma API desenvolvida com **FastAPI** que realiza a rasp
 - **Fallback**: se o site estiver fora ou demorar, os dados são retornados do `vitibrasil.db`.
 - **Atualização manual**: `atualizar_banco.py` atualiza o banco com base nas raspagens locais.
 
+
+## ⚙️ Instalação e Execução Local
+
+### Pré-requisitos
+
+- Python 3.10+
+- Git
+
+### Passos
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/Drakkhar/FASE1_TC.git
+   cd FASE1_TC
+Crie e ative um ambiente virtual:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # No Windows: venv\Scripts\activate
+```
+
+Instale as dependências:
+```bash
+pip install -r requirements.txt
+Raspagem e atualização dos dados:
+```
+
+```bash
+python scraper.py
+python atualizar_banco.py
+```
+
+Inicie a API:
+```bash
+uvicorn main:app --reload
+```
+
+Acesse a documentação interativa da API:
+
+http://127.0.0.1:8000/docs
+
+🚀 Implantação
+O projeto está configurado para ser implantado na plataforma Vercel, utilizando o arquivo vercel.json. Basta conectar o repositório à sua conta Vercel e realizar a primeira implantação.
+
 ## Colaboradores
 
 - Pedro Paolielo

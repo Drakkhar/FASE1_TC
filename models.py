@@ -1,6 +1,4 @@
-# models.py
-
-from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -12,25 +10,23 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 Base = declarative_base()
 
-# Exemplo de tabela para Produção
+#Producao
 class Producao(Base):
     __tablename__ = "producao"
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
-    produto_macro = Column(String, nullable=False)
-    produto_micro = Column(String, nullable=False)
+    produto = Column(String, nullable=False)
     quantidade = Column(Integer, nullable=False)
 
-# Exemplo de tabela para Processamento
+#Processamento
 class Processamento(Base):
     __tablename__ = "processamento"
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
     tipo = Column(String, nullable=False)
-    produto_macro = Column(String, nullable=False)
-    produto_micro = Column(String, nullable=False)    
+    produto = Column(String, nullable=False)    
     quantidade = Column(Integer, nullable=False)
 
 # Comercialização
@@ -39,12 +35,11 @@ class Comercializacao(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     ano = Column(Integer, nullable=False)
-    produto_macro = Column(String, nullable=False)
-    produto_micro = Column(String, nullable=False)
+    produto = Column(String, nullable=False)
     quantidade = Column(Integer, nullable=False)
 
 
-# Importação
+## Importação
 class Importacao(Base):
     __tablename__ = "importacao"
 
@@ -55,7 +50,7 @@ class Importacao(Base):
     quantidade = Column(Integer, nullable=False)
     valor = Column(Integer, nullable=False)
 
-# Exportação
+## Exportação
 class Exportacao(Base):
     __tablename__ = "exportacao"
 
